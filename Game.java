@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Hashtable;
 
+/**
+ * Game state of the tile puzzle
+ */
 class Game {
     Hashtable<String, String> move_cost = new Hashtable<String, String>();
     int n_size;
@@ -16,6 +19,16 @@ class Game {
     List<String> path_to_here = new ArrayList<String>();
     boolean do_heuristic;
     char last_direction;
+    /**
+     * [Game description]
+     * @param move_cost    [description]
+     * @param matrix       [description]
+     * @param n_size       [description]
+     * @param m_size       [description]
+     * @param blank_row    [description]
+     * @param blank_column [description]
+     * @param do_heuristic [description]
+     */
     Game(Hashtable<String, String> move_cost, String[][] matrix, int n_size, int m_size, int blank_row, int blank_column, boolean do_heuristic)
     {
       this.move_cost = move_cost;
@@ -33,6 +46,11 @@ class Game {
       }
       this.last_direction = '_';
     }
+    /**
+     * [Game description]
+     * @param game      [description]
+     * @param direction [description]
+     */
     Game(Game game, char direction)
     {
       this.move_cost = game.move_cost;
@@ -88,6 +106,10 @@ class Game {
         this.path_to_here.add(this.matrix[game.blank_row][game.blank_column] + direction);
         this.last_direction = direction;
     }
+    /**
+     * [calculate_heuristic description]
+     * @return [description]
+     */
     private int calculate_heuristic()
     {
       // manhaten * cost of movement
@@ -99,12 +121,16 @@ class Game {
             if (!this.matrix[i][j].equals("_"))
             {
               int loc = Integer.parseInt(this.matrix[i][j]) - 1;
-              heuristic_value += Integer.parseInt(move_cost.get(this.matrix[i][j])) * (Math.abs(loc/m_size - i)  + Math.abs((loc%m_size - j)%m_size));
+              heuristic_value += Integer.parseInt(move_cost.get(this.matrix[i][j])) * (Math.abs(loc/this.m_size - i)  + Math.abs(loc%this.m_size - j));
             }
           }
       }
       return heuristic_value;
     }
+    /**
+     * [get_successors description]
+     * @return [description]
+     */
     public List<Game> get_successors()
     {
       List<Game> successors = new ArrayList<>();
@@ -135,6 +161,10 @@ class Game {
 
       return successors;
     }
+    /**
+     * [is_goal description]
+     * @return [description]
+     */
     public boolean is_goal(){
       for(int i = 0; i<this.n_size; i++)
       {
@@ -151,6 +181,10 @@ class Game {
       }
       return true;
     }
+    /**
+     * [matrix_to_string description]
+     * @return [description]
+     */
     public String matrix_to_string()
     {
       String str = "";
@@ -163,20 +197,12 @@ class Game {
       }
       return str;
     }
+    /**
+     * [toString description]
+     * @return [description]
+     */
     public String toString()
     {
-      //overriding the toString() method
-    //   String print_matrix = "";
-    //
-    // for(int i = 0; i<this.n_size; i++)
-    // {
-    //     for(int j = 0; j<this.m_size; j++)
-    //     {
-    //       print_matrix += this.matrix[i][j] + " ";
-    //     }
-    //     print_matrix += "\n";
-    // }
-      // return String.join("-", this.path_to_here) + "\n" + print_matrix + "\ncost: " + this.cost + " is_goal: " + this.is_goal();
       return String.join("-", this.path_to_here);
     }
 }

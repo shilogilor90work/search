@@ -1,6 +1,8 @@
-import java.io.File;  // Import the File class
-import java.io.FileNotFoundException;  // Import this class to handle errors
-import java.util.Scanner; // Import the Scanner class to read text files
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -15,12 +17,16 @@ import java.util.Comparator;
 import java.util.Comparator;
 
 
-
-
-
+/**
+ * class Ex1 for search algorithm task
+ * @author Shilo Gilor
+ */
 public class Ex1 {
   static int node_counter = 0;
   static long totalTime;
+  /**
+   *class comparator for comparing game states for the PriorityQueue
+   */
   static public class Heuristic_cost implements Comparator<Game> {
       @Override
       public int compare(Game x, Game y) {
@@ -33,7 +39,11 @@ public class Ex1 {
           return 0;
       }
   }
-
+/**
+ * create the start state from the raw input data
+ * @param  data raw input data
+ * @return game object
+ */
   static public Game create_start_state(Raw_input data)
   {
     boolean do_heuristic = false;
@@ -44,6 +54,10 @@ public class Ex1 {
     }
     return new Game(data.move_cost, data.matrix, data.n_size, data.m_size, data.blank_row, data.blank_column, do_heuristic);
   }
+  /**
+   * read the input file and turn in to the Raw_input object
+   * @return Raw_input object
+   */
   static public Raw_input read_input()
   {
     Hashtable<String, String> move_cost = new Hashtable<String, String>();
@@ -62,13 +76,13 @@ public class Ex1 {
         algo = myReader.nextLine();
         time_info = myReader.nextLine();
         open_info = myReader.nextLine();
+        String size_info = myReader.nextLine();
+        n_size =  Integer.parseInt(size_info.substring(0 , size_info.indexOf("x")));
+        m_size =  Integer.parseInt(size_info.substring(size_info.indexOf("x") + 1));
         String black_raw_info = myReader.nextLine();
         black_info = black_raw_info.substring(black_raw_info.indexOf(":") + 1).replaceAll("\\s","").split(",");
         String red_raw_info = myReader.nextLine();
         red_info = red_raw_info.substring(red_raw_info.indexOf(":") + 1).replaceAll("\\s","").split(",");
-        String size_info = myReader.nextLine();
-        n_size =  Integer.parseInt(size_info.substring(0 , size_info.indexOf("x")));
-        m_size =  Integer.parseInt(size_info.substring(size_info.indexOf("x") + 1));
         matrix = new String[n_size][m_size];
         for(int i=0;i<n_size;i++)
         {
@@ -101,6 +115,11 @@ public class Ex1 {
     return new Raw_input(algo, time_info, open_info, move_cost, black_info, matrix, n_size, m_size, blank_row, blank_column);
 }
 
+/**
+ * function to check if all non movable tiles are in their correct place.
+ * @param  data the raw input info
+ * @return boolean of if the tiles are ok failing being in the correct place
+ */
   static public boolean pre_black_check_failure(Raw_input data)
   {
     if (data.black_info.length == 1 && data.black_info[0].equals(""))
@@ -117,9 +136,13 @@ public class Ex1 {
     }
     return false;
   }
+  /**
+   * BFS - Breafth First Search, algorithm
+   * @param  game game state
+   * @return the game state solved with the path to get there.
+   */
  static public Game BFS(Game game)
  {
-   long startTime = System.currentTimeMillis();
    Queue<Game> frontier = new LinkedList<Game>();
    Set<String> visited = new HashSet<String>();
    frontier.add(game);
@@ -130,8 +153,6 @@ public class Ex1 {
      visited.add(first_in_line.matrix_to_string());
      if (first_in_line.is_goal())
      {
-       long endTime   = System.currentTimeMillis();
-       totalTime = endTime - startTime;
        return first_in_line;
      }
      else
@@ -145,8 +166,6 @@ public class Ex1 {
        }
      }
    }
-   long endTime = System.currentTimeMillis();
-   totalTime = endTime - startTime;
    return null;
  }
 
@@ -154,11 +173,15 @@ public class Ex1 {
 
 
 
-
+/**
+ * DFID - Depth First Iterative Deepening, algorithm (recursive)
+ * @param  game      game state.
+ * @param  max_depth max depth to check if state is goal.
+ * @return the game state solved with the path to get there.
+ */
  static public Game DFID(Game game, int max_depth)
  {
    int depth_counter = 1;
-   long startTime = System.currentTimeMillis();
    Stack<Game> frontier = new Stack<Game>();
    Set<String> visited = new HashSet<String>();
    frontier.push(game);
@@ -169,8 +192,6 @@ public class Ex1 {
      visited.add(first_in_line.matrix_to_string());
      if (first_in_line.is_goal())
      {
-       long endTime   = System.currentTimeMillis();
-       totalTime = endTime - startTime;
        return first_in_line;
      }
      if (first_in_line.path_to_here.size() < max_depth)
@@ -184,15 +205,16 @@ public class Ex1 {
        }
      }
    }
-   long endTime = System.currentTimeMillis();
-   totalTime = endTime - startTime;
    return DFID(game, max_depth + 1);
  }
 
-
+/**
+ * A* algorithm uses PriorityQueue of logic of h(x) + c(x)
+ * @param  game      game state.
+ * @return the game state solved with the path to get there.
+ */
  static public Game A_star(Game game)
  {
-   long startTime = System.currentTimeMillis();
    Comparator<Game> comparator = new Heuristic_cost();
    PriorityQueue<Game> frontier = new PriorityQueue<Game>(100,comparator);
    Set<String> visited = new HashSet<String>();
@@ -204,8 +226,6 @@ public class Ex1 {
      visited.add(first_in_line.matrix_to_string());
      if (first_in_line.is_goal())
      {
-       long endTime   = System.currentTimeMillis();
-       totalTime = endTime - startTime;
        return first_in_line;
      }
      else
@@ -219,16 +239,19 @@ public class Ex1 {
        }
      }
    }
-   long endTime = System.currentTimeMillis();
-   totalTime = endTime - startTime;
    return null;
  }
 
 
-
+/**
+ * IDA* - Iterative Deepening A* algorithm uses A* but has a max depth to check if in goal state.
+ * @param  game      game state.
+ * @param  max_depth max depth to check if state is goal.
+ * @return the game state solved with the path to get there.
+ */
  static public Game IDA_star(Game game, int max_depth)
  {
-   long startTime = System.currentTimeMillis();
+
    Comparator<Game> comparator = new Heuristic_cost();
    PriorityQueue<Game> frontier = new PriorityQueue<Game>(100,comparator);
    Set<String> visited = new HashSet<String>();
@@ -240,8 +263,6 @@ public class Ex1 {
      visited.add(first_in_line.matrix_to_string());
      if (first_in_line.is_goal())
      {
-       long endTime   = System.currentTimeMillis();
-       totalTime = endTime - startTime;
        return first_in_line;
      }
      else
@@ -258,14 +279,51 @@ public class Ex1 {
        }
      }
    }
-   long endTime = System.currentTimeMillis();
-   totalTime = endTime - startTime;
-   return DFID(game, max_depth + 1);
+   return IDA_star(game, max_depth + 1);
  }
 
 
 
+ static public Game DFBnB(Game game)
+ {
+   Comparator<Game> comparator = new Heuristic_cost();
+   Stack<Game> frontier = new Stack<Game>();
+   Set<String> loop_avoidance = new HashSet<String>();
+   Game solution = null;
+   Integer min_cost = Integer.MAX_VALUE;
+   frontier.add(game);
+   loop_avoidance.add(game.matrix_to_string());
+   while (!frontier.isEmpty())
+   {
+     node_counter +=1;
+     Game first_in_line = frontier.pop();
+     if (first_in_line.is_goal() && min_cost>first_in_line.cost)
+     {
+       solution = first_in_line;
+       min_cost = first_in_line.cost;
+     }
+     else
+     {
+       for (Game next_game : first_in_line.get_successors())
+       {
 
+         if (!loop_avoidance.contains(next_game.matrix_to_string()) && next_game.cost < min_cost)
+         {
+           System.out.println(next_game.matrix_to_string());
+           frontier.push(next_game);
+           loop_avoidance.add(next_game.matrix_to_string());
+         }
+       }
+     }
+   }
+   return solution;
+ }
+
+
+/**
+ * Main
+ * @param args
+ */
   public static void main(String[] args)
   {
     String message = null;
@@ -278,6 +336,7 @@ public class Ex1 {
     }
     else
     {
+      long startTime = System.currentTimeMillis();
       switch (data.algo)
       {
         case "BFS":
@@ -293,11 +352,31 @@ public class Ex1 {
           solution = IDA_star(start_game, 1);
           break;
         case "DFBnB":
-          // solution = DFBnB(start_game);
+          solution = DFBnB(start_game);
           break;
       }
-      message = solution + "\nNum: " + node_counter + "\nCost: " + solution.cost + "\n" + totalTime/1000.0 + " seconds";
+      long endTime = System.currentTimeMillis();
+      totalTime = endTime - startTime;
+      message = solution + "\nNum: " + node_counter + "\nCost: " + solution.cost + "\n";
     }
-    System.out.println(message);
+    if (data.time_info)
+    {
+      message += totalTime/1000.0 + " seconds";
+    }
+    if (data.open_info)
+    {
+      System.out.println(message);
+    }
+    else
+    {
+      try {
+        FileWriter myWriter = new FileWriter("output.txt");
+         myWriter.write(message);
+         myWriter.close();
+       } catch (IOException e) {
+         System.out.println("An error occurred.");
+         e.printStackTrace();
+       }
+    }
  }
 }

@@ -1,9 +1,24 @@
-IDA*
+DFBnB
 with time
-no open
+with open
+3x3
 Black:
-Red: 11
-3x4
+Red:
+1,2,3
+4,6,_
+7,5,8
+
+
+
+Black:
+Red:
 1,2,3,4
 5,6,11,7
+9,10,8,_
+
+
+Black:
+Red:
+3,1,2,4
+11,5,6,7
 9,10,8,_
