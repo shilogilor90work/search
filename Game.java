@@ -21,13 +21,13 @@ class Game {
     char last_direction;
     /**
      * [Game description]
-     * @param move_cost    [description]
-     * @param matrix       [description]
-     * @param n_size       [description]
-     * @param m_size       [description]
-     * @param blank_row    [description]
-     * @param blank_column [description]
-     * @param do_heuristic [description]
+     * @param move_cost    move cost
+     * @param matrix       matrix of the board
+     * @param n_size       hieght size of matrix
+     * @param m_size       length size of matrix
+     * @param blank_row    blank row location
+     * @param blank_column blank column location
+     * @param do_heuristic should we run caculating the heuristic value.
      */
     Game(Hashtable<String, String> move_cost, String[][] matrix, int n_size, int m_size, int blank_row, int blank_column, boolean do_heuristic)
     {
@@ -47,9 +47,9 @@ class Game {
       this.last_direction = '_';
     }
     /**
-     * [Game description]
-     * @param game      [description]
-     * @param direction [description]
+     * consructor for next move
+     * @param game      game state of last position
+     * @param direction char of where to go
      */
     Game(Game game, char direction)
     {
@@ -107,8 +107,8 @@ class Game {
         this.last_direction = direction;
     }
     /**
-     * [calculate_heuristic description]
-     * @return [description]
+     * calculate heuristic value
+     * @return int of the estamated cost to get to final
      */
     private int calculate_heuristic()
     {
@@ -128,42 +128,33 @@ class Game {
       return heuristic_value;
     }
     /**
-     * [get_successors description]
-     * @return [description]
+     * add all options of movable peaces
+     * @return list of Games of new options
      */
     public List<Game> get_successors()
     {
       List<Game> successors = new ArrayList<>();
-      if (this.blank_column != this.m_size - 1) {
-        if (!move_cost.get(this.matrix[this.blank_row][this.blank_column + 1]).equals("false") && last_direction != 'R')
-        {
-          successors.add(new Game(this, 'L'));
-        }
+      if (this.blank_column != this.m_size - 1 && !move_cost.get(this.matrix[this.blank_row][this.blank_column + 1]).equals("false") && last_direction != 'R')
+      {
+        successors.add(new Game(this, 'L'));
       }
-      if (this.blank_row != this.n_size - 1) {
-        if (!move_cost.get(this.matrix[this.blank_row + 1][this.blank_column]).equals("false") && last_direction != 'D')
-        {
-          successors.add(new Game(this, 'U'));
-        }
+      if (this.blank_row != this.n_size - 1 && !move_cost.get(this.matrix[this.blank_row + 1][this.blank_column]).equals("false") && last_direction != 'D')
+      {
+        successors.add(new Game(this, 'U'));
       }
-      if (this.blank_column != 0) {
-        if (!move_cost.get(this.matrix[this.blank_row][this.blank_column - 1]).equals("false") && last_direction != 'L')
-        {
-          successors.add(new Game(this, 'R'));
-        }
+      if (this.blank_column != 0 && !move_cost.get(this.matrix[this.blank_row][this.blank_column - 1]).equals("false") && last_direction != 'L')
+      {
+        successors.add(new Game(this, 'R'));
       }
-      if (this.blank_row != 0) {
-        if (!move_cost.get(this.matrix[this.blank_row - 1][this.blank_column]).equals("false") && last_direction != 'U')
-        {
-          successors.add(new Game(this, 'D'));
-        }
+      if (this.blank_row != 0 && !move_cost.get(this.matrix[this.blank_row - 1][this.blank_column]).equals("false") && last_direction != 'U')
+      {
+        successors.add(new Game(this, 'D'));
       }
-
       return successors;
     }
     /**
-     * [is_goal description]
-     * @return [description]
+     * is goal state
+     * @return boolean of if we are in the goal state.
      */
     public boolean is_goal(){
       for(int i = 0; i<this.n_size; i++)
@@ -182,8 +173,8 @@ class Game {
       return true;
     }
     /**
-     * [matrix_to_string description]
-     * @return [description]
+     * turning the matrix to a string that is unique to each setup of matrix build.
+     * @return String of the matrix as string.
      */
     public String matrix_to_string()
     {
@@ -198,8 +189,8 @@ class Game {
       return str;
     }
     /**
-     * [toString description]
-     * @return [description]
+     * print the path to this node.
+     * @return string of the path in the format for handing in this task
      */
     public String toString()
     {

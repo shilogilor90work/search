@@ -1,7 +1,7 @@
 import java.util.Hashtable;
 
 /**
- *
+ * Raw input from file.
  */
 class Raw_input {
     String algo;
@@ -15,17 +15,17 @@ class Raw_input {
     int blank_row;
     int blank_column;
     /**
-     * [Raw_input description]
-     * @param algo         [description]
-     * @param time_info    [description]
-     * @param open_info    [description]
-     * @param move_cost    [description]
-     * @param black_info   [description]
-     * @param matrix       [description]
-     * @param n_size       [description]
-     * @param m_size       [description]
-     * @param blank_row    [description]
-     * @param blank_column [description]
+     * Raw input from file
+     * @param algo         which algo to use
+     * @param time_info    boolean to calculate time
+     * @param open_info    boolean if to print to screen
+     * @param move_cost    move cost matrix
+     * @param black_info   tiles that can not be moved.
+     * @param matrix       the matrix of the board
+     * @param n_size       matrix height size
+     * @param m_size       matrix length size
+     * @param blank_row    location of blank row
+     * @param blank_column location of blank column
      */
     Raw_input(String algo, String time_info, String open_info, Hashtable<String, String> move_cost,String[] black_info, String[][] matrix, int n_size, int m_size, int blank_row, int blank_column)
     {
@@ -52,5 +52,4 @@ class Raw_input {
       this.blank_row = blank_row;
       this.blank_column = blank_column;
     }
-
   }

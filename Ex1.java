@@ -15,6 +15,9 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Comparator;
 import java.util.Comparator;
+import java.util.Collections;
+
+
 
 
 /**
@@ -194,9 +197,11 @@ public class Ex1 {
      {
        return first_in_line;
      }
-     if (first_in_line.path_to_here.size() < max_depth)
+     if (first_in_line.path_to_here.size() <= max_depth)
      {
-       for (Game next_game : first_in_line.get_successors())
+       List<Game> successors = first_in_line.get_successors();
+       Collections.reverse(successors);
+       for (Game next_game : successors)
        {
          if (!visited.contains(next_game.matrix_to_string()))
          {
