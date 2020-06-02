@@ -14,8 +14,8 @@ import java.util.Queue;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Comparator;
-import java.util.Comparator;
 import java.util.Collections;
+
 
 
 
@@ -33,13 +33,7 @@ public class Ex1 {
   static public class Heuristic_cost implements Comparator<Game> {
       @Override
       public int compare(Game x, Game y) {
-          if (x.heuristic + x.cost < y.heuristic + y.cost) {
-              return -1;
-          }
-          if (x.heuristic + x.cost > y.heuristic + y.cost) {
-              return 1;
-          }
-          return 0;
+        return (x.f) - (y.f);
       }
   }
 /**
@@ -149,11 +143,12 @@ public class Ex1 {
    Queue<Game> frontier = new LinkedList<Game>();
    Set<String> visited = new HashSet<String>();
    frontier.add(game);
+   visited.add(game.matrix_to_string());
    while (!frontier.isEmpty())
    {
      node_counter +=1;
      Game first_in_line = frontier.remove();
-     visited.add(first_in_line.matrix_to_string());
+     System.out.println(first_in_line.matrix_to_string());
      if (first_in_line.is_goal())
      {
        return first_in_line;
@@ -192,6 +187,8 @@ public class Ex1 {
    {
      node_counter +=1;
      Game first_in_line = frontier.pop();
+     System.out.println(first_in_line);
+
      visited.add(first_in_line.matrix_to_string());
      if (first_in_line.is_goal())
      {
@@ -212,6 +209,71 @@ public class Ex1 {
    }
    return DFID(game, max_depth + 1);
  }
+
+
+ static public Game DFID_2(Game game)
+ {
+   Game result;
+   int depth = 0;
+   node_counter +=1;
+   while (true)
+   {
+     depth ++;
+     Set<String> visited = new HashSet<String>();
+     result = Limited_DFS(game,depth,visited);
+     if (!result.get_cutoff())
+     {
+       return result;
+     }
+   }
+ }
+ static public Game Limited_DFS(Game game, int limit, Set<String> h)
+ {
+   Game result;
+   boolean is_cutoff = false;
+   if (game.is_goal())
+   {
+     return game;
+   }
+   else if (limit == 0)
+   {
+     game.set_cutoff(true);
+     return game;
+   } else
+   {
+     h.add(game.matrix_to_string());
+     is_cutoff = false;
+
+     for (Game next_game : game.get_successors())
+     {
+       if (!h.contains(next_game.matrix_to_string()))
+       {
+         node_counter +=1;
+         result = Limited_DFS(next_game,limit-1,h);
+         if (result.get_cutoff())
+         {
+           is_cutoff = true;
+         } else
+         {
+           return result;
+         }
+       }
+     }
+     h.remove(game.matrix_to_string());
+     if (is_cutoff)
+     {
+       game.set_cutoff(true);
+       return game;
+     } else
+     {
+       game.set_cutoff(false);
+       return game;
+     }
+   }
+ }
+
+
+
 
 /**
  * A* algorithm uses PriorityQueue of logic of h(x) + c(x)
@@ -287,7 +349,163 @@ public class Ex1 {
    return IDA_star(game, max_depth + 1);
  }
 
+ public static Stack<Game> remove_item(Stack<Game> stack, Game game)
+ {
+     Stack<Game> temp = new Stack<Game>();
+     while (!stack.isEmpty())
+     {
+         Game check = stack.pop();
+         if( ! check.matrix_to_string().equals(game.matrix_to_string()))
+         {
+             temp.push(check);
+         }
+     }
 
+     return temp;
+ }
+
+
+ /**
+  * IDA* - Iterative Deepening A* algorithm uses A* but has a max depth to check if in goal state.
+  * @param  game      game state.
+  * @param  max_depth max depth to check if state is goal.
+  * @return the game state solved with the path to get there.
+  */
+  static public Game IDA_star_2(Game game)
+  {
+    Stack<Game> frontier = new Stack<Game>();
+    Hashtable<String, Game> visited = new Hashtable<String, Game>();
+    int minf;
+    int t = game.heuristic;
+    Game this_game;
+    node_counter += 1;
+    while (true)
+    {
+      minf = Integer.MAX_VALUE;
+      frontier.push(game);
+      visited.put(game.matrix_to_string(), game);
+      while (!frontier.isEmpty())
+      {
+        this_game = frontier.pop();
+        if (this_game.get_isout())
+        {
+          visited.remove(this_game.matrix_to_string());
+        } else
+        {
+          this_game.set_isout(true);
+          frontier.push(this_game);
+          for (Game next_game : this_game.get_successors())
+          {
+            node_counter += 1;
+            if (next_game.f > t)
+            {
+              minf = Math.min(minf, next_game.f);
+              continue;
+            }
+            if (visited.contains(next_game.matrix_to_string()) && visited.get(next_game.matrix_to_string()).get_isout())
+            {
+              continue;
+            }
+            if (visited.contains(next_game.matrix_to_string()) && !visited.get(next_game.matrix_to_string()).get_isout())
+            {
+              Game old_game = visited.get(next_game.matrix_to_string());
+              if (old_game.f > next_game.f)
+              {
+                visited.remove(old_game.matrix_to_string());
+                frontier = remove_item(frontier, old_game);
+              } else
+              {
+                continue;
+              }
+            }
+            if (next_game.is_goal())
+            {
+              return next_game;
+            }
+            frontier.push(next_game);
+            visited.put(next_game.matrix_to_string(), next_game);
+          }
+        }
+      }
+      t = minf;
+    }
+  }
+
+
+
+  /**
+   * IDA* - Iterative Deepening A* algorithm uses A* but has a max depth to check if in goal state.
+   * @param  game      game state.
+   * @param  max_depth max depth to check if state is goal.
+   * @return the game state solved with the path to get there.
+   */
+   static public Game DFBnB_2(Game game)
+   {
+     Stack<Game> frontier = new Stack<Game>();
+     Hashtable<String, Game> visited = new Hashtable<String, Game>();
+     int minf;
+     int t = Integer.MAX_VALUE;
+     Game this_game;
+     Game result = null;
+     node_counter += 1;
+     frontier.push(game);
+     visited.put(game.matrix_to_string(), game);
+     while (!frontier.isEmpty())
+     {
+       this_game = frontier.pop();
+       if (this_game.get_isout())
+       {
+         visited.remove(this_game.matrix_to_string());
+       } else
+       {
+         this_game.set_isout(true);
+         frontier.push(this_game);
+         List<Game> N = this_game.get_successors();
+         Collections.sort(N, new Heuristic_cost());
+         for (int index = 0;index<N.size();index++)
+         {
+           Game next_game = N.get(index);
+           node_counter += 1;
+           if (next_game.f >= t)
+           {
+             N.subList(index, N.size()).clear();
+           }
+           else if (visited.contains(next_game.matrix_to_string()) && visited.get(next_game.matrix_to_string()).get_isout())
+           {
+             N.remove(next_game);
+             index --;
+           }
+           else if (visited.contains(next_game.matrix_to_string()) && !visited.get(next_game.matrix_to_string()).get_isout())
+           {
+             Game old_game = visited.get(next_game.matrix_to_string());
+             if (old_game.f <= next_game.f)
+             {
+               N.remove(next_game);
+               index --;
+
+             } else
+             {
+               visited.remove(old_game.matrix_to_string());
+               frontier = remove_item(frontier, old_game);
+             }
+           }
+           else if (next_game.is_goal())
+           {
+             t = next_game.f;
+             result = next_game;
+             N.subList(index, N.size()).clear();
+           }
+         }
+         Collections.reverse(N);
+         for (Game next_game : N)
+         {
+           frontier.push(next_game);
+           visited.put(next_game.matrix_to_string(), next_game);
+         }
+       }
+     }
+     return result;
+   }
 
  static public Game DFBnB(Game game)
  {
@@ -342,25 +560,42 @@ public class Ex1 {
     else
     {
       long startTime = System.currentTimeMillis();
+      long endTime = System.currentTimeMillis();
       switch (data.algo)
       {
         case "BFS":
+          startTime = System.currentTimeMillis();
           solution = BFS(start_game);
+          endTime = System.currentTimeMillis();
           break;
         case "DFID":
+          startTime = System.currentTimeMillis();
           solution = DFID(start_game, 1);
+          endTime = System.currentTimeMillis();
           break;
         case "A*":
+          startTime = System.currentTimeMillis();
           solution = A_star(start_game);
+          endTime = System.currentTimeMillis();
           break;
         case "IDA*":
-          solution = IDA_star(start_game, 1);
+          startTime = System.currentTimeMillis();
+          // solution = IDA_star(start_game, 1);
+          solution = IDA_star_2(start_game);
+
+          endTime = System.currentTimeMillis();
           break;
         case "DFBnB":
-          solution = DFBnB(start_game);
+          startTime = System.currentTimeMillis();
+          // solution = DFBnB(start_game);
+          solution = DFBnB_2(start_game);
+          endTime = System.currentTimeMillis();
           break;
+        case "DFID_2":
+          startTime = System.currentTimeMillis();
+          solution = IDA_star_2(start_game);
+          endTime = System.currentTimeMillis();
       }
-      long endTime = System.currentTimeMillis();
       totalTime = endTime - startTime;
       message = solution + "\nNum: " + node_counter + "\nCost: " + solution.cost + "\n";
     }

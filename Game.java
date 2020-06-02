@@ -19,6 +19,9 @@ class Game {
     List<String> path_to_here = new ArrayList<String>();
     boolean do_heuristic;
     char last_direction;
+    boolean cutoff;
+    boolean isout;
+    int f;
     /**
      * [Game description]
      * @param move_cost    move cost
@@ -45,6 +48,9 @@ class Game {
         this.heuristic = calculate_heuristic();
       }
       this.last_direction = '_';
+      this.cutoff = false;
+      this.isout = false;
+      this.f = this.heuristic + this.cost;
     }
     /**
      * consructor for next move
@@ -65,6 +71,8 @@ class Game {
             this.matrix[i][j] = game.matrix[i][j];
           }
       }
+      this.cutoff = false;
+      this.isout = false;
       this.blank_row = game.blank_row;
       this.blank_column = game.blank_column;
       this.path_to_here = game.path_to_here;
@@ -105,6 +113,7 @@ class Game {
         }
         this.path_to_here.add(this.matrix[game.blank_row][game.blank_column] + direction);
         this.last_direction = direction;
+        this.f = this.heuristic + this.cost;
     }
     /**
      * calculate heuristic value
@@ -183,10 +192,26 @@ class Game {
       {
           for(int j = 0; j<this.m_size; j++)
           {
-              str += this.matrix[i][j];
+              str += this.matrix[i][j] + "_";
           }
       }
       return str;
+    }
+    public void set_cutoff(boolean bool)
+    {
+      this.cutoff = bool;
+    }
+    public boolean get_cutoff()
+    {
+      return this.cutoff;
+    }
+    public void set_isout(boolean bool)
+    {
+      this.isout = bool;
+    }
+    public boolean get_isout()
+    {
+      return this.isout;
     }
     /**
      * print the path to this node.
