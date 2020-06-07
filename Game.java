@@ -1,4 +1,3 @@
-import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -22,29 +21,29 @@ class Game {
     boolean cutoff;
     boolean isout;
     int f;
+
+
     /**
-     * [Game description]
-     * @param move_cost    move cost
-     * @param matrix       matrix of the board
-     * @param n_size       hieght size of matrix
-     * @param m_size       length size of matrix
-     * @param blank_row    blank row location
-     * @param blank_column blank column location
-     * @param do_heuristic should we run caculating the heuristic value.
+     * Game start state
+     * @param data raw data to build start state of game
      */
-    Game(Hashtable<String, String> move_cost, String[][] matrix, int n_size, int m_size, int blank_row, int blank_column, boolean do_heuristic)
+    Game(Raw_input data)
     {
-      this.move_cost = move_cost;
-      this.n_size = n_size;
-      this.m_size = m_size;
-      this.matrix = matrix;
-      this.blank_row = blank_row;
-      this.blank_column = blank_column;
-      this.move_cost = move_cost;
+      this.do_heuristic = false;
+      if (data.algo.equals("A*") || data.algo.equals("IDA*") || data.algo.equals("DFBnB"))
+      {
+        this.do_heuristic = true;
+      }
+      this.move_cost = data.move_cost;
+      this.n_size = data.n_size;
+      this.m_size = data.m_size;
+      this.matrix = data.matrix;
+      this.blank_row = data.blank_row;
+      this.blank_column = data.blank_column;
+      this.move_cost = data.move_cost;
       this.cost = 0;
-      this.do_heuristic = do_heuristic;
       this.heuristic = 0;
-      if (do_heuristic) {
+      if (this.do_heuristic) {
         this.heuristic = calculate_heuristic();
       }
       this.last_direction = '_';
@@ -197,18 +196,34 @@ class Game {
       }
       return str;
     }
+    /**
+     * set cutoff
+     * @param bool true false
+     */
     public void set_cutoff(boolean bool)
     {
       this.cutoff = bool;
     }
+    /**
+     * get cutoff
+     * @return boolean
+     */
     public boolean get_cutoff()
     {
       return this.cutoff;
     }
+    /**
+     * set isout
+     * @param bool true false
+     */
     public void set_isout(boolean bool)
     {
       this.isout = bool;
     }
+    /**
+     * get isout
+     * @return bool
+     */
     public boolean get_isout()
     {
       return this.isout;

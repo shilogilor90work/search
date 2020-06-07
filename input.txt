@@ -1,6 +1,30 @@
 DFBnB
 with time
 with open
+3x3
+Black:
+Red:
+_,7,2
+1,5,3
+4,8,6
+
+
+
+2,8,3
+4,5,6
+7,1,_
+
+
+
+
+
+_,7,2
+1,5,3
+4,8,6
+
+DFBnB
+with time
+with open
 3x4
 Black:
 Red: 11
@@ -9,6 +33,19 @@ Red: 11
 9,10,8,_
 
 
+
+
+
+
+DFID
+with time
+with open
+3x4
+Black:
+Red: 11
+1,2,3,4
+5,6,11,7
+9,10,8,_
 
 Black:
 Red:

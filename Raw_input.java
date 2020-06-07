@@ -1,5 +1,9 @@
 import java.util.Hashtable;
-
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
 /**
  * Raw input from file.
  */
@@ -14,42 +18,74 @@ class Raw_input {
     String[][] matrix;
     int blank_row;
     int blank_column;
+
     /**
-     * Raw input from file
-     * @param algo         which algo to use
-     * @param time_info    boolean to calculate time
-     * @param open_info    boolean if to print to screen
-     * @param move_cost    move cost matrix
-     * @param black_info   tiles that can not be moved.
-     * @param matrix       the matrix of the board
-     * @param n_size       matrix height size
-     * @param m_size       matrix length size
-     * @param blank_row    location of blank row
-     * @param blank_column location of blank column
+     * Raw input from the input.txt file converted to an object.
      */
-    Raw_input(String algo, String time_info, String open_info, Hashtable<String, String> move_cost,String[] black_info, String[][] matrix, int n_size, int m_size, int blank_row, int blank_column)
+    Raw_input()
     {
-      this.algo = algo;
-      if (time_info.equals("with time"))
-      {
-        this.time_info = true;
-      } else
-      {
-        this.time_info = false;
-      }
-      if (open_info.equals("with open"))
-      {
-        this.open_info = true;
-      } else
-      {
-        this.open_info = false;
-      }
-      this.move_cost = move_cost;
-      this.m_size = m_size;
-      this.n_size = n_size;
-      this.black_info = black_info;
-      this.matrix = matrix;
-      this.blank_row = blank_row;
-      this.blank_column = blank_column;
+      try {
+        // read file
+          Scanner myReader = new Scanner(new File("input.txt"));
+          // algorithm type
+          this.algo = myReader.nextLine();
+          // with time bool
+          if (myReader.nextLine().equals("with time"))
+          {
+            this.time_info = true;
+          } else
+          {
+            this.time_info = false;
+          }
+          // with open bool
+          if (myReader.nextLine().equals("with open"))
+          {
+            this.open_info = true;
+          } else
+          {
+            this.open_info = false;
+          }
+          String size_info = myReader.nextLine();
+          // n_size data
+          this.n_size =  Integer.parseInt(size_info.substring(0 , size_info.indexOf("x")));
+          // m_size data
+          this.m_size =  Integer.parseInt(size_info.substring(size_info.indexOf("x") + 1));
+          String black_raw_info = myReader.nextLine();
+          // black as array info
+          this.black_info = black_raw_info.substring(black_raw_info.indexOf(":") + 1).replaceAll("\\s","").split(",");
+          String red_raw_info = myReader.nextLine();
+          // red as array info
+          String [] red_info = red_raw_info.substring(red_raw_info.indexOf(":") + 1).replaceAll("\\s","").split(",");
+          // initialize  the matrix size
+          this.matrix = new String[this.n_size][this.m_size];
+          // initialize the move_cost data
+          for(int i=0;i<this.n_size;i++)
+          {
+            String[] result = myReader.nextLine().split(",");
+            for(int j=0;j<result.length;j++)
+            {
+              this.matrix[i][j] = result[j];
+              if (Arrays.asList(red_info).contains(this.matrix[i][j]))
+              {
+                this.move_cost.put(this.matrix[i][j], "30");
+              } else if (Arrays.asList(this.black_info).contains(this.matrix[i][j]))
+              {
+                this.move_cost.put(this.matrix[i][j], "false");
+              } else
+              {
+                this.move_cost.put(this.matrix[i][j], "1");
+              }
+              if (this.matrix[i][j].equals("_"))
+              {
+                this.blank_row = i;
+                this.blank_column = j;
+              }
+            }
+          }
+          myReader.close();
+        } catch (FileNotFoundException e) {
+          System.out.println("An error occurred.");
+          e.printStackTrace();
+        }
     }
   }
